@@ -21,18 +21,16 @@ io.on('connection', (socket) => {
         console.log('User was disconnected!');
     });
 
-    socket.emit('newMessage', {
-        from: "me@example.com",
-        text: "Have fun!",
-        createdAt: 1234
-    });
-
     socket.on('createMessage', (message) => {
         console.log('New message', message);
-    });
+
+        io.emit('newMessage', {
+            from: message.from,
+            text: message.text,
+            createdAt: new Date().getTime()
+        });
+    });  
 });
-
-
 
 server.listen(port, () => {
     console.log(`Server is up on port ${port}`);
