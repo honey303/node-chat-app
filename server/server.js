@@ -13,31 +13,32 @@ var app = express();
 var server = http.createServer(app);
 var io = socketIO(server);
 
-// middleware to the static page
+// Middleware to render the static page
 app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
     console.log('New user connected');
 
-    socket.on('disconnect', () => {
-        console.log('User was disconnected!');
-    });
-
     socket.emit("newMessage", {
-        from: "admin", 
+        from: "Admin", 
         text: "Welcome!",
         createdAt: new Date().getTime()
     });
 
     socket.broadcast.emit("newMessage", generateMessage("Admin", "New user joined!"));
 
-    socket.on('createMessage', (message) => {
+    socket.on('createMessage', (message, callback) => {
         console.log('New message', message);
 
         io.emit('newMessage', generateMessage( message.from, message.text));
+        callback('This is from the server!');
 
         // socket.broadcast.emit('newMessage', generateMessage( message.from, message.text));
     });  
+
+    socket.on('disconnect', () => {
+        console.log('User was disconnected!');
+    });
 });
 
 server.listen(port, () => {
